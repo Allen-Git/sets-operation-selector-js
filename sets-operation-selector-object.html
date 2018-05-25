@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="300" height="300" stynle="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script>
+
+function SetSelector(element, radius) {
+  this.init(element, radius);
+}
+
+SetSelector.prototype.init = function(element, radius) {
+  
+  this.debug = false;
+  this.$this = this;
+  this.radius = radius;
+  this.element = element;
+  this.ctx = element.getContext("2d");
+  this.selectedArea = [];
+  this.result = '';
+
+  element.addEventListener('click', this);
+
+  var width = radius / 2;
+  var height = Math.sqrt(radius ** 2 - width ** 2);
+
+  this.baseCirclePoint = {
+      x: 120,
+      y: 75,
+      v: 4,
+      color: '#FEF9E7'
+    };
+  this.leftCirclePoint = {
+      x: this.baseCirclePoint.x - width,
+      y: this.baseCirclePoint.y + height,
+      v: 2,
+      color: '#E8DAEF'
+    };
+  this.rightCirclePoint = {
+      x: this.baseCirclePoint.x + width,
+      y: this.baseCirclePoint.y + height,
+      v: 1,
+      color: '#FDEDEC'
+    };
+  this.draw();
+};
+
+SetSelector.prototype.getCursorPosition = function(canvas, event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+    return {x: x, y: y};
+};
+
+SetSelector.prototype.isSelectCircle = function(circle, point) {
+  if (this.debug) {
+    var ctx = this.ctx;
+    ctx.globalCompositeOperation='source-over';
+    ctx.beginPath();
+    ctx.moveTo(point.x, point.y)
+    ctx.lineTo(circle.x, circle.y)
+    ctx.stroke();
+  }
+  if (Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < this.radius) {
+    return circle.v;
+  }
+  return 0;
+};
+
+SetSelector.prototype.arc = function(point, fromAngle, toAngle) {
+  this.ctx.arc(point.x, point.y, this.radius, fromAngle * Math.PI, toAngle * Math.PI);
+};
+
+SetSelector.prototype.moveTo = function(point) {
+  this.ctx.moveTo(point.x, point.y);
+};
+
+SetSelector.prototype.draw = function(areas = [0]) {
+  var ctx = this.ctx;
+  ctx.clearRect(0, 0, this.element.width, this.element.height);
+  ctx.beginPath();
+  this.arc(this.baseCirclePoint, 0.5 * 2/3, 0.5 * 2/3 * 2);
+  this.arc(this.rightCirclePoint, 1, 1 + 0.5 * 2/3);
+  this.arc(this.leftCirclePoint, 1.5 + 0.5 * 1/3, 2);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fillStyle = 'white'
+  areas.forEach(area => {
+    if ((area & 0b111) == 0b111) {
+      ctx.fillStyle = 'red'
+    }
+  });
+  ctx.fill()
+
+  ctx.globalCompositeOperation='destination-over';
+  ctx.beginPath();
+  this.arc(this.rightCirclePoint, 1 + 0.5 * 2/3, 1 + 0.5 * 2/3 * 2);
+  this.arc(this.baseCirclePoint, 0, 0.5 * 2/3);
+  this.moveTo(this.baseCirclePoint);
+  this.arc(this.leftCirclePoint, 1.5 + 0.5 * 1/3, 2);
+  ctx.stroke();
+  ctx.fillStyle = 'white'
+  areas.forEach(area => {
+    if ((area & 0b111) == (this.baseCirclePoint.v | this.rightCirclePoint.v)) {
+      ctx.fillStyle = 'blue'
+    }
+  });
+  ctx.fill()
+
+  ctx.beginPath();
+  this.arc(this.baseCirclePoint, 0.5 + 0.5 * 1/3, 1);
+  this.arc(this.leftCirclePoint, 1 + 0.5 * 2/3, 1 + 0.5 * 2/3 * 2);
+  this.moveTo(this.leftCirclePoint);
+  this.arc(this.rightCirclePoint, 1, 1 + 0.5 * 2/3);
+  ctx.stroke();
+  ctx.fillStyle = 'white'
+  areas.forEach(area => {
+    if ((area & 0b111) == (this.baseCirclePoint.v | this.leftCirclePoint.v)) {
+      ctx.fillStyle = 'green'
+    }
+  });
+  ctx.fill()
+
+  ctx.beginPath();
+  this.arc(this.leftCirclePoint, 0, 0.5 * 2/3);
+  this.arc(this.rightCirclePoint, 0.5 + 0.5 * 1/3, 1);
+  this.moveTo(this.rightCirclePoint);
+  this.arc(this.baseCirclePoint, 0.5 * 2/3, 0.5 + 0.5 * 1/3);
+  ctx.stroke();
+  ctx.fillStyle = 'white'
+  areas.forEach(area => {
+    if ((area & 0b111) == (this.leftCirclePoint.v | this.rightCirclePoint.v)) {
+      ctx.fillStyle = 'yellow'
+    }
+  });
+  ctx.fill()
+  
+  this.fillOnlyRemainCircle(this.baseCirclePoint, areas)
+  this.fillOnlyRemainCircle(this.rightCirclePoint, areas)
+  this.fillOnlyRemainCircle(this.leftCirclePoint, areas)
+};
+
+SetSelector.prototype.fillOnlyRemainCircle = function(circle, areas) {
+  var ctx = this.ctx;
+  ctx.beginPath();
+  this.arc(circle, 0, 2);
+  ctx.stroke();
+  ctx.fillStyle = 'white'
+  areas.forEach(area => {
+    if ((area & 0b111) == circle.v) {
+      ctx.fillStyle = circle.color
+    }
+  });
+  ctx.fill();
+};
+
+SetSelector.prototype.handleEvent = function(e) {
+  switch(e.type) {
+    case "click":
+        this.handleClick(e);
+        break;
+  }
+}
+
+SetSelector.prototype.handleClick = function(e) {
+  debugger
+    var selectedArea = this.selectedArea;
+    var point = this.getCursorPosition(this.element, e);
+    var val = 0;
+    val += this.isSelectCircle(this.baseCirclePoint, point);
+    val += this.isSelectCircle(this.leftCirclePoint, point);
+    val += this.isSelectCircle(this.rightCirclePoint, point);
+    var idx = selectedArea.indexOf(val);
+    if (idx == -1) {
+      selectedArea.push(val);
+    } else {
+      selectedArea.splice(idx, 1);
+    }
+    this.result = selectedArea.join(',');
+    this.draw(selectedArea);
+    document.getElementById("result").innerHTML=this.result;
+};
+
+var selector = new SetSelector(document.getElementById("myCanvas"), 50);
+
+</script> <br/>
+selected:<div id="result"></div>
+</body>
+</html>

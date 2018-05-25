@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="jquery.setselector.js"></script>
+	
+</head>
+<body>
+
+  <canvas id="myCanvas" width="300" height="300" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+<div id="result"></div>
+<script type="text/javascript">
+		$("#myCanvas").setselector({
+		    radius: 50,
+		 //    areaClicked: function(e, data) {
+			// 	$("#result").text(data.selectedArea.join(','));
+			// }
+		});
+		$("#myCanvas").on('areaClicked.ss', function(e, data) {
+			$("#result").text(data.selectedArea.join(','));
+		});
+	</script>
+</body>
+</html>
