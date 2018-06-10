@@ -45,19 +45,19 @@
       this.baseCirclePoint = {
           x: 120,
           y: 75,
-          v: 4,
+          v: 'X',
           color: '#FEF9E7'
         };
       this.leftCirclePoint = {
           x: this.baseCirclePoint.x - width,
           y: this.baseCirclePoint.y + height,
-          v: 2,
+          v: 'Y',
           color: '#E8DAEF'
         };
       this.rightCirclePoint = {
           x: this.baseCirclePoint.x + width,
           y: this.baseCirclePoint.y + height,
-          v: 1,
+          v: 'Z',
           color: '#FDEDEC'
         };
       this.draw();
@@ -82,7 +82,7 @@
       if (Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < this.radius) {
         return circle.v;
       }
-      return 0;
+      return '';
     };
 
     SetSelector.prototype.arc = function(point, fromAngle, toAngle) {
@@ -104,7 +104,7 @@
       ctx.stroke();
       ctx.fillStyle = 'white'
       areas.forEach(area => {
-        if ((area & 0b111) == 0b111) {
+        if (area == (this.baseCirclePoint.v + this.leftCirclePoint.v + this.rightCirclePoint.v)) {
           ctx.fillStyle = 'red'
         }
       });
@@ -119,7 +119,7 @@
       ctx.stroke();
       ctx.fillStyle = 'white'
       areas.forEach(area => {
-        if ((area & 0b111) == (this.baseCirclePoint.v | this.rightCirclePoint.v)) {
+        if (area == (this.baseCirclePoint.v + this.rightCirclePoint.v)) {
           ctx.fillStyle = 'blue'
         }
       });
@@ -133,7 +133,7 @@
       ctx.stroke();
       ctx.fillStyle = 'white'
       areas.forEach(area => {
-        if ((area & 0b111) == (this.baseCirclePoint.v | this.leftCirclePoint.v)) {
+        if (area == (this.baseCirclePoint.v + this.leftCirclePoint.v)) {
           ctx.fillStyle = 'green'
         }
       });
@@ -147,7 +147,7 @@
       ctx.stroke();
       ctx.fillStyle = 'white'
       areas.forEach(area => {
-        if ((area & 0b111) == (this.leftCirclePoint.v | this.rightCirclePoint.v)) {
+        if (area == (this.leftCirclePoint.v + this.rightCirclePoint.v)) {
           ctx.fillStyle = 'yellow'
         }
       });
@@ -165,7 +165,7 @@
       ctx.stroke();
       ctx.fillStyle = 'white'
       areas.forEach(area => {
-        if ((area & 0b111) == circle.v) {
+        if (area == circle.v) {
           ctx.fillStyle = circle.color
         }
       });
@@ -175,7 +175,7 @@
     SetSelector.prototype.handleClick = function(e) {
         var selectedArea = this.selectedArea;
         var point = this.getCursorPosition(this.element, e);
-        var val = 0;
+        var val = '';
         val += this.isSelectCircle(this.baseCirclePoint, point);
         val += this.isSelectCircle(this.leftCirclePoint, point);
         val += this.isSelectCircle(this.rightCirclePoint, point);

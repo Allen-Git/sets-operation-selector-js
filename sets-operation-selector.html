@@ -13,19 +13,19 @@ var height = Math.sqrt(radius ** 2 - width ** 2);
 var baseCirclePoint = {
     x: 120,
     y: 75,
-    v: 4,
+    v: 'A',
     color: '#FEF9E7'
   };
 var leftCirclePoint = {
     x: baseCirclePoint.x - width,
     y: baseCirclePoint.y + height,
-    v: 2,
+    v: 'B',
     color: '#E8DAEF'
   };
 var rightCirclePoint = {
     x: baseCirclePoint.x + width,
     y: baseCirclePoint.y + height,
-    v: 1,
+    v: 'C',
     color: '#FDEDEC'
   };
 var debug = false;
@@ -35,7 +35,7 @@ var ctx = c.getContext("2d");
 var selectedArea = [];
 c.addEventListener('click', (e) => {
   var point = getCursorPosition(c, e);
-  var val = 0;
+  var val = '';
   val += isSelectCircle(baseCirclePoint, point);
   val += isSelectCircle(leftCirclePoint, point);
   val += isSelectCircle(rightCirclePoint, point);
@@ -67,7 +67,7 @@ function isSelectCircle(circle, point) {
   if (Math.sqrt((point.x-circle.x) ** 2 + (point.y - circle.y) ** 2) < radius) {
     return circle.v;
   }
-  return 0;
+  return '';
 }
 
 function arc(point, fromAngle, toAngle) {
@@ -78,7 +78,7 @@ function moveTo(point) {
   ctx.moveTo(point.x, point.y);
 }
 
-function draw(areas = [0]) {
+function draw(areas = []) {
   ctx.clearRect(0, 0, c.width, c.height);
   ctx.beginPath();
   arc(baseCirclePoint, 0.5 * 2/3, 0.5 * 2/3 * 2);
@@ -88,7 +88,7 @@ function draw(areas = [0]) {
   ctx.stroke();
   ctx.fillStyle = 'white'
   areas.forEach(area => {
-  	if ((area & 0b111) == 0b111) {
+  	if (area == (baseCirclePoint.v + leftCirclePoint.v + rightCirclePoint.v)) {
       ctx.fillStyle = 'red'
     }
   });
@@ -103,7 +103,7 @@ function draw(areas = [0]) {
   ctx.stroke();
   ctx.fillStyle = 'white'
   areas.forEach(area => {
-  	if ((area & 0b111) == (baseCirclePoint.v | rightCirclePoint.v)) {
+  	if (area == (baseCirclePoint.v + rightCirclePoint.v)) {
       ctx.fillStyle = 'blue'
     }
   });
@@ -117,7 +117,7 @@ function draw(areas = [0]) {
   ctx.stroke();
   ctx.fillStyle = 'white'
   areas.forEach(area => {
-  	if ((area & 0b111) == (baseCirclePoint.v | leftCirclePoint.v)) {
+  	if (area == (baseCirclePoint.v + leftCirclePoint.v)) {
       ctx.fillStyle = 'green'
     }
   });
@@ -131,7 +131,7 @@ function draw(areas = [0]) {
   ctx.stroke();
   ctx.fillStyle = 'white'
   areas.forEach(area => {
-  	if ((area & 0b111) == (leftCirclePoint.v | rightCirclePoint.v)) {
+  	if (area == (leftCirclePoint.v + rightCirclePoint.v)) {
       ctx.fillStyle = 'yellow'
     }
   });
@@ -148,7 +148,7 @@ function fillOnlyRemainCircle(circle, areas) {
   ctx.stroke();
   ctx.fillStyle = 'white'
   areas.forEach(area => {
-  	if ((area & 0b111) == circle.v) {
+  	if (area == circle.v) {
       ctx.fillStyle = circle.color
     }
   });
