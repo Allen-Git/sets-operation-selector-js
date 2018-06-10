@@ -80,6 +80,14 @@ function moveTo(point) {
 
 function draw(areas = []) {
   ctx.clearRect(0, 0, c.width, c.height);
+
+  ctx.font = "12px Arial";
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.fillText(baseCirclePoint.v, baseCirclePoint.x, baseCirclePoint.y - 20);
+  ctx.fillText(leftCirclePoint.v, leftCirclePoint.x - 20, leftCirclePoint.y + 20);
+  ctx.fillText(rightCirclePoint.v, rightCirclePoint.x + 20, rightCirclePoint.y + 20);
+  
   ctx.beginPath();
   arc(baseCirclePoint, 0.5 * 2/3, 0.5 * 2/3 * 2);
   arc(rightCirclePoint, 1, 1 + 0.5 * 2/3);

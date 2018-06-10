@@ -80,6 +80,14 @@ SetSelector.prototype.moveTo = function(point) {
 SetSelector.prototype.draw = function(areas = [0]) {
   var ctx = this.ctx;
   ctx.clearRect(0, 0, this.element.width, this.element.height);
+
+  ctx.font = "12px Arial";
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.fillText(this.baseCirclePoint.v, this.baseCirclePoint.x, this.baseCirclePoint.y - 20);
+  ctx.fillText(this.leftCirclePoint.v, this.leftCirclePoint.x - 20, this.leftCirclePoint.y + 20);
+  ctx.fillText(this.rightCirclePoint.v, this.rightCirclePoint.x + 20, this.rightCirclePoint.y + 20);
+
   ctx.beginPath();
   this.arc(this.baseCirclePoint, 0.5 * 2/3, 0.5 * 2/3 * 2);
   this.arc(this.rightCirclePoint, 1, 1 + 0.5 * 2/3);

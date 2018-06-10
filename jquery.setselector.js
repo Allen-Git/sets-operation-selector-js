@@ -21,7 +21,7 @@
  */
 ;(function ( $ ) {
   
-    function SetSelector(element, radius, areaClicked) {
+    function SetSelector(element, radius, labels, areaClicked) {
       this.debug = false;
       this.radius = radius;
       this.element = element[0];
@@ -35,29 +35,29 @@
           this.$element.bind('areaClicked.ss', areaClicked);
       }
 
-      this.init(element, radius);
+      this.init(element, radius, labels);
     }
 
-    SetSelector.prototype.init = function(element, radius) {
+    SetSelector.prototype.init = function(element, radius, labels) {
       var width = radius / 2;
       var height = Math.sqrt(radius ** 2 - width ** 2);
 
       this.baseCirclePoint = {
           x: 120,
           y: 75,
-          v: 'X',
+          v: labels[0],
           color: '#FEF9E7'
         };
       this.leftCirclePoint = {
           x: this.baseCirclePoint.x - width,
           y: this.baseCirclePoint.y + height,
-          v: 'Y',
+          v: labels[1],
           color: '#E8DAEF'
         };
       this.rightCirclePoint = {
           x: this.baseCirclePoint.x + width,
           y: this.baseCirclePoint.y + height,
-          v: 'Z',
+          v: labels[2],
           color: '#FDEDEC'
         };
       this.draw();
@@ -96,6 +96,14 @@
     SetSelector.prototype.draw = function(areas = [0]) {
       var ctx = this.ctx;
       ctx.clearRect(0, 0, this.element.width, this.element.height);
+
+      ctx.font = "12px Arial";
+      ctx.fillStyle = "black";
+      ctx.textAlign = "center";
+      ctx.fillText(this.baseCirclePoint.v, this.baseCirclePoint.x, this.baseCirclePoint.y - 20);
+      ctx.fillText(this.leftCirclePoint.v, this.leftCirclePoint.x - 20, this.leftCirclePoint.y + 20);
+      ctx.fillText(this.rightCirclePoint.v, this.rightCirclePoint.x + 20, this.rightCirclePoint.y + 20);
+
       ctx.beginPath();
       this.arc(this.baseCirclePoint, 0.5 * 2/3, 0.5 * 2/3 * 2);
       this.arc(this.rightCirclePoint, 1, 1 + 0.5 * 2/3);
@@ -192,7 +200,8 @@
     // Create the defaults once
     var pluginName = 'setselector',
         defaults = {
-            radius: 50
+            radius: 50,
+            labels: ['X', 'Y', 'Z']
         };
 
     // The actual plugin constructor
@@ -208,7 +217,8 @@
 
     Plugin.prototype.init = function () {
         var radius = this.options['radius'];
-        var selector = new SetSelector(this.element, radius, this.options['areaClicked']);
+        var labels = this.options['labels'];
+        var selector = new SetSelector(this.element, radius, labels, this.options['areaClicked']);
         this.selector = selector;
 
         selector.draw();
